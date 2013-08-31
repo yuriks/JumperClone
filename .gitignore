@@ -1,0 +1,6 @@
+*.swp
+
+*.opensdf
+/JumperClone.sdf
+/JumperClone.*.suo
+/JumperClone.*.user
