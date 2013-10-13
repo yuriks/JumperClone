@@ -70,6 +70,7 @@
     <ClCompile Include="libyuriks\math\misc.cpp" />
     <ClCompile Include="libyuriks\math\Quaternion.cpp" />
     <ClCompile Include="libyuriks\math\Sphere.cpp" />
+    <ClCompile Include="src\EntitySystem.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +83,7 @@
     <ClInclude Include="libyuriks\math\TransformPair.hpp" />
     <ClInclude Include="libyuriks\math\vec.hpp" />
     <ClInclude Include="libyuriks\SortedVector.hpp" />
+    <ClInclude Include="src\EntityQuery.hpp" />
     <ClInclude Include="src\EntitySystem.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

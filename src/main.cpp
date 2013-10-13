@@ -1,3 +1,4 @@
+#include "EntityQuery.hpp"
 #include "EntitySystem.hpp"
 #include "math/vec.hpp"
 #include <iostream>
