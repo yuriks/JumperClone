@@ -44,6 +44,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>src/;libyuriks/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -56,6 +57,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>src/;libyuriks/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -64,7 +66,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libyuriks\math\MatrixTransform.cpp" />
+    <ClCompile Include="libyuriks\math\misc.cpp" />
+    <ClCompile Include="libyuriks\math\Quaternion.cpp" />
+    <ClCompile Include="libyuriks\math\Sphere.cpp" />
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libyuriks\math\mat.hpp" />
+    <ClInclude Include="libyuriks\math\MatrixTransform.hpp" />
+    <ClInclude Include="libyuriks\math\misc.hpp" />
+    <ClInclude Include="libyuriks\math\Quaternion.hpp" />
+    <ClInclude Include="libyuriks\math\Ray.hpp" />
+    <ClInclude Include="libyuriks\math\Sphere.hpp" />
+    <ClInclude Include="libyuriks\math\TransformPair.hpp" />
+    <ClInclude Include="libyuriks\math\vec.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
