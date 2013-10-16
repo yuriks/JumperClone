@@ -1,5 +1,7 @@
 #pragma once
+#include "Handle.hpp"
 #include "SortedVector.hpp"
+#include "memory/ObjectPool.hpp"
 #include <cstdint>
 #include <string>
 #include <tuple>
@@ -16,10 +18,12 @@ struct ComponentType {
 	{}
 };
 
-typedef uint32_t EntityId;
-static const EntityId invalid_entity = ~0;
+typedef yks::Handle ComponentHandle;
+
+typedef yks::Handle EntityId;
 struct Entity {
 	std::string name;
+	SortedVector<std::tuple<ComponentTypeId, ComponentHandle>> components;
 
 	Entity() {}
 	Entity(const std::string& name)
@@ -27,21 +31,17 @@ struct Entity {
 	{}
 };
 
-typedef uint32_t ComponentId;
-static const ComponentId invalid_component = ~0;
-
 struct EntityWorld {
-	typedef SortedVector<std::tuple<EntityId, ComponentId>> EntityComponentMap;
-	typedef SortedVector<std::tuple<ComponentTypeId, ComponentId>> ComponentEntityMap;
-
+	typedef SortedVector<std::tuple<EntityId, ComponentHandle>> EntityComponentMap;
+	
 	std::vector<ComponentType> component_types;
-	std::vector<Entity> entities;
-	std::vector<ComponentId> component_ids;
-	std::vector<EntityComponentMap> entities_by_component;
-	std::vector<ComponentEntityMap> components_by_entity;
+	yks::ObjectPool<Entity> entities;
+	std::vector<EntityComponentMap> components_by_component_type;
+
+	bool typeExists(ComponentTypeId type);
 
 	void addComponentType(ComponentTypeId id, const std::string& name);
 	EntityId createEntity(const std::string& name);
-	ComponentId addComponentToEntity(EntityId entity, ComponentTypeId type);
+	void addComponentToEntity(EntityId entity, ComponentTypeId type, ComponentHandle handle);
 	void removeComponentFromEntity(EntityId entity, ComponentTypeId type);
 };

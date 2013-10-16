@@ -2,6 +2,16 @@
 #include "EntitySystem.hpp"
 #include "math/vec.hpp"
 #include <iostream>
+#include "TextureManager.hpp"
+#include "memory/ObjectPool.hpp"
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_main.h>
+#include "video.hpp"
+#include "gl/gl_1_5.h"
+#include "gl/gl_assert.hpp"
+#include "render/SpriteBuffer.hpp"
+#include "memory/TypedDynamicPool.hpp"
 
 using namespace yks;
 
@@ -11,50 +21,126 @@ struct Position  {
 	static const ComponentTypeId component_id = 0;
 
 	vec2i position;
+
+	Position(int x, int y)
+		: position{{x, y}}
+	{}
 };
+TypedDynamicPool<Position> positionPool;
 
 struct Velocity {
 	static const ComponentTypeId component_id = 1;
 
 	vec2i velocity;
-};
 
-struct DrawCircle {
+	Velocity(int x, int y)
+		: velocity{{x, y}}
+	{}
+};
+TypedDynamicPool<Velocity> velocityPool;
+
+struct CircleRenderer {
 	static const ComponentTypeId component_id = 2;
 
 	int radius;
+
+	CircleRenderer(int radius)
+		: radius(radius)
+	{}
 };
+TypedDynamicPool<CircleRenderer> circleRendererPool;
 
-int main() {
-	world.addComponentType(Position::component_id, "position");
-	world.addComponentType(Velocity::component_id, "velocity");
-	world.addComponentType(DrawCircle::component_id, "draw_circle");
+TextureManager texture_manager;
 
-	world.createEntity("0");
-	world.createEntity("1");
-	world.createEntity("2");
-	world.createEntity("3");
-	world.createEntity("4");
+int main(int argc, char *argv[]) {
+	world.addComponentType(Position::component_id, "Position");
+	world.addComponentType(Velocity::component_id, "Velocity");
+	world.addComponentType(CircleRenderer::component_id, "CircleRenderer");
 
-	world.addComponentToEntity(0, Position::component_id);
+	Handle e0 = world.createEntity("pos");
+	Handle e1 = world.createEntity("pos_circle");
+	Handle e2 = world.createEntity("pos_vel");
+	Handle e3 = world.createEntity("pos_vel_circle1");
+	Handle e4 = world.createEntity("pos_vel_circle2");
 
-	world.addComponentToEntity(1, Position::component_id);
-	world.addComponentToEntity(1, DrawCircle::component_id);
+	world.addComponentToEntity(e0, Position::component_id, positionPool.emplace(0, 0));
 
-	world.addComponentToEntity(2, Position::component_id);
-	world.addComponentToEntity(2, Velocity::component_id);
+	world.addComponentToEntity(e1, Position::component_id, positionPool.emplace(0, 0));
+	world.addComponentToEntity(e1, CircleRenderer::component_id, circleRendererPool.emplace(4));
 
-	world.addComponentToEntity(3, Position::component_id);
-	world.addComponentToEntity(3, Velocity::component_id);
-	world.addComponentToEntity(3, DrawCircle::component_id);
+	world.addComponentToEntity(e2, Position::component_id, positionPool.emplace(0, 0));
+	world.addComponentToEntity(e2, Velocity::component_id, velocityPool.emplace(2, 1));
 
-	world.addComponentToEntity(4, Position::component_id);
-	world.addComponentToEntity(4, Velocity::component_id);
-	world.addComponentToEntity(4, DrawCircle::component_id);
+	world.addComponentToEntity(e3, Position::component_id, positionPool.emplace(0, 0));
+	world.addComponentToEntity(e3, Velocity::component_id, velocityPool.emplace(1, 2));
+	world.addComponentToEntity(e3, CircleRenderer::component_id, circleRendererPool.emplace(4));
 
-	for (auto i : query(world, Position::component_id, Velocity::component_id)) {
-		std::cout << i[0] << " " << i[1] << std::endl;
+	world.addComponentToEntity(e4, Position::component_id, positionPool.emplace(0, 0));
+	world.addComponentToEntity(e4, Velocity::component_id, velocityPool.emplace(2, 2));
+	world.addComponentToEntity(e4, CircleRenderer::component_id, circleRendererPool.emplace(8));
+
+	Window window;
+	if (!window.open(640, 480)) {
+		return 1;
 	}
 
-	std::cout << "Done!" << std::endl;
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+	glMatrixMode(GL_PROJECTION);
+	GLfloat view_matrix[16] = {
+		2.0f / window.width, 0, 0, -1,
+		0, -2.0f / window.height, 0, 1,
+		0, 0, 1, 0,
+		0, 0, 0, 1
+	};
+	glLoadTransposeMatrixf(view_matrix);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	YKS_CHECK_GL;
+
+	glEnable(GL_TEXTURE_2D);
+	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+
+	Handle tex = texture_manager.loadTexture("test", "data/test.png");
+
+	SpriteBufferIndices spr_indices;
+	SpriteBuffer main_buffer;
+	main_buffer.texture_size = vec2i{{64, 64}};
+
+	Sprite spr;
+
+	for (;;) {
+		main_buffer.clear();
+
+		glClear(GL_COLOR_BUFFER_BIT);
+
+		glBindTexture(GL_TEXTURE_2D, texture_manager.texture_pool[tex]->api_handle);
+
+		for (auto i : query(world, Position::component_id, Velocity::component_id)) {
+			positionPool[i[0]]->position += velocityPool[i[1]]->velocity;
+		}
+
+		for (auto i : query(world, Position::component_id, CircleRenderer::component_id)) {
+			spr.pos = positionPool[i[0]]->position;
+			spr.img = IntRect{0, 0, 64, 64};
+			main_buffer.append(spr);
+		}
+
+		main_buffer.draw(spr_indices);
+
+		window.flip();
+
+		SDL_Event ev;
+		SDL_WaitEvent(&ev);
+		if (ev.type == SDL_QUIT) {
+			break;
+		}
+	}
+
+	window.close();
+	SDL_Quit();
+
+	return 0;
 }

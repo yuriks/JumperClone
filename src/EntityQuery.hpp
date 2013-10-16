@@ -8,8 +8,8 @@ struct EntityQueryIter {
 	static_assert(num_types >= 1, "Need to query at least one type.");
 
 	EntityWorld* world;
-	std::array<EntityWorld::ComponentEntityMap::const_iterator, num_types> iters;
-	std::array<EntityWorld::ComponentEntityMap::const_iterator, num_types> end_iters;
+	std::array<EntityWorld::EntityComponentMap::const_iterator, num_types> iters;
+	std::array<EntityWorld::EntityComponentMap::const_iterator, num_types> end_iters;
 
 	EntityQueryIter()
 		: world(nullptr)
@@ -19,7 +19,7 @@ struct EntityQueryIter {
 		: world(world)
 	{
 		for (size_t i = 0; i < num_types; ++i) {
-			auto& x = world->entities_by_component[types[i]];
+			auto& x = world->components_by_component_type[types[i]];
 			iters[i] = x.data.cbegin();
 			end_iters[i] = x.data.cend();
 			if (iters[i] == end_iters[i]) {
@@ -54,7 +54,7 @@ struct EntityQueryIter {
 
 		bool advanced;
 		do {
-			ComponentId max_id = std::get<0>(*iters[0]);
+			EntityId max_id = std::get<0>(*iters[0]);
 			for (size_t i = 1; i < num_types; ++i) {
 				max_id = std::max(max_id, std::get<0>(*iters[i]));
 			}
@@ -86,9 +86,9 @@ struct EntityQueryIter {
 		return *this;
 	}
 
-	std::array<ComponentId, num_types> operator*() const {
+	std::array<ComponentHandle, num_types> operator*() const {
 		assert(world != nullptr);
-		std::array<ComponentId, num_types> ret;
+		std::array<ComponentHandle, num_types> ret;
 		for (size_t i = 0; i < num_types; ++i) {
 			ret[i] = std::get<1>(*iters[i]);
 		}
