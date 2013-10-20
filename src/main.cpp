@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
 
 	SpriteBufferIndices spr_indices;
 	SpriteBuffer main_buffer;
-	main_buffer.texture_size = vec2i{{64, 64}};
+	main_buffer.texture_size = texture_manager[tex]->size;
 
 	Sprite spr;
 
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glBindTexture(GL_TEXTURE_2D, texture_manager.texture_pool[tex]->api_handle);
+		glBindTexture(GL_TEXTURE_2D, texture_manager[tex]->api_handle);
 
 		for (auto i : query(world, Position::component_id, Velocity::component_id)) {
 			positionPool[i[0]]->position += velocityPool[i[1]]->velocity;

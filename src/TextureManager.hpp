@@ -19,4 +19,8 @@ struct TextureManager {
 
 	yks::Handle loadTexture(const std::string& name, const std::string& filename, LoadOptions options = LoadOptions());
 	void deleteTexture(yks::Handle h);
+
+	const Texture* operator[](yks::Handle h) const {
+		return texture_pool[h];
+	}
 };
