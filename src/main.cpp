@@ -119,15 +119,15 @@ int main(int argc, char *argv[]) {
 
 		glBindTexture(GL_TEXTURE_2D, texture_manager[tex]->api_handle);
 
-		for (auto i : query(world, Position::component_id, Velocity::component_id)) {
-			positionPool[i[0]]->position += velocityPool[i[1]]->velocity;
-		}
+		query_for_each(world, std::tie(positionPool, velocityPool), [&](Position& pos, const Velocity& vel) {
+			pos.position += vel.velocity;
+		});
 
-		for (auto i : query(world, Position::component_id, SpriteRenderer::component_id)) {
-			spr.pos = positionPool[i[0]]->position;
-			spr.img = spriteRendererPool[i[1]]->img_rect;
+		query_for_each(world, std::tie(positionPool, spriteRendererPool), [&](const Position& pos, const SpriteRenderer& renderer) {
+			spr.pos = pos.position;
+			spr.img = renderer.img_rect;
 			main_buffer.append(spr);
-		}
+		});
 
 		main_buffer.draw(spr_indices);
 

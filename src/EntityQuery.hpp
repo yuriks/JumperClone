@@ -2,6 +2,7 @@
 #include "EntitySystem.hpp"
 #include <array>
 #include <cassert>
+#include "index_tuple.hpp"
 
 template <size_t num_types>
 struct EntityQueryIter {
@@ -117,8 +118,20 @@ struct EntityQuery {
 	}
 };
 
-template<class T, class... Tail>
-static EntityQuery<1 + sizeof...(Tail)> query(EntityWorld& world, T head, Tail... tail) {
+template <typename T, typename... Tail>
+EntityQuery<1 + sizeof...(Tail)> query(EntityWorld& world, T head, Tail... tail) {
 	std::array<T, 1 + sizeof...(Tail)> a = {head, tail ...};
 	return EntityQuery<1 + sizeof...(Tail)>(&world, a);
+}
+
+template <typename Fn, typename Tup, size_t... i>
+void query_for_each_impl(const Tup& pools, const Fn& fn, const std::array<ComponentHandle, sizeof...(i)>& handles, index_tuple<i...>) {
+	fn(*(std::get<i>(pools)[std::get<i>(handles)])...);
+}
+
+template <typename Fn, typename... Comp>
+void query_for_each(EntityWorld& world, const std::tuple<yks::ObjectPool<Comp>&...>& pools, const Fn& fn) {
+	for (auto handles : query(world, Comp::component_id...)) {
+		query_for_each_impl(pools, fn, handles, make_indexes<Comp...>::type());
+	}
 }
