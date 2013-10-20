@@ -1,11 +1,12 @@
 #pragma once
 #include "Handle.hpp"
 #include "memory/ObjectPool.hpp"
+#include "math/vec.hpp"
 #include <string>
 
 struct Texture {
 	uint32_t api_handle;
-	int width, height;
+	yks::vec2i size;
 	std::string name;
 };
 

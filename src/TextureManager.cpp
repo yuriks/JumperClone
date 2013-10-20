@@ -46,8 +46,7 @@ yks::Handle TextureManager::loadTexture(const std::string& name, const std::stri
 
 	Texture tex;
 	tex.api_handle = api_handle;
-	tex.width = width;
-	tex.height = height;
+	tex.size = yks::vec2i{{width, height}};
 	tex.name = name;
 
 	yks::Handle h = texture_pool.emplace(tex);
