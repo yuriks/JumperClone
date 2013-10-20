@@ -20,9 +20,9 @@ EntityWorld world;
 struct Position  {
 	static const ComponentTypeId component_id = 0;
 
-	vec2i position;
+	vec2 position;
 
-	Position(vec2i position)
+	Position(vec2 position)
 		: position(position)
 	{}
 };
@@ -31,9 +31,9 @@ ObjectPool<Position> positionPool;
 struct Velocity {
 	static const ComponentTypeId component_id = 1;
 
-	vec2i velocity;
+	vec2 velocity;
 
-	Velocity(vec2i velocity)
+	Velocity(vec2 velocity)
 		: velocity(velocity)
 	{}
 };
@@ -54,9 +54,9 @@ ObjectPool<SpriteRenderer> spriteRendererPool;
 struct Gravity {
 	static const ComponentTypeId component_id = 3;
 
-	vec2i acceleration;
+	vec2 acceleration;
 
-	Gravity(vec2i acceleration)
+	Gravity(vec2 acceleration)
 		: acceleration(acceleration)
 	{}
 };
@@ -76,21 +76,21 @@ int main(int argc, char *argv[]) {
 	Handle e3 = world.createEntity("pos_vel_circle1");
 	Handle e4 = world.createEntity("pos_vel_circle2");
 
-	world.addComponentToEntity(positionPool, e0, vec2i{{0, 0}});
+	world.addComponentToEntity(positionPool, e0, vec2{{0, 0}});
 
-	world.addComponentToEntity(positionPool, e1, vec2i{{0, 0}});
+	world.addComponentToEntity(positionPool, e1, vec2{{0, 0}});
 	world.addComponentToEntity(spriteRendererPool, e1, 0, IntRect{32, 0, 16, 16});
 
-	world.addComponentToEntity(positionPool, e2, vec2i{{0, 0}});
-	world.addComponentToEntity(velocityPool, e2, vec2i{{2, 1}});
+	world.addComponentToEntity(positionPool, e2, vec2{{0, 0}});
+	world.addComponentToEntity(velocityPool, e2, vec2{{2, 1}});
 
-	world.addComponentToEntity(positionPool, e3, vec2i{{0, 0}});
-	world.addComponentToEntity(velocityPool, e3, vec2i{{1, 2}});
-	world.addComponentToEntity(gravityPool, e3, vec2i{{0, 1}});
+	world.addComponentToEntity(positionPool, e3, vec2{{0, 0}});
+	world.addComponentToEntity(velocityPool, e3, vec2{{1, 0}});
+	world.addComponentToEntity(gravityPool, e3, vec2{{0, 0.03}});
 	world.addComponentToEntity(spriteRendererPool, e3, 0, IntRect{32, 0, 16, 16});
 
-	world.addComponentToEntity(positionPool, e4, vec2i{{0, 0}});
-	world.addComponentToEntity(velocityPool, e4, vec2i{{2, 2}});
+	world.addComponentToEntity(positionPool, e4, vec2{{0, 0}});
+	world.addComponentToEntity(velocityPool, e4, vec2{{2, 2}});
 	world.addComponentToEntity(spriteRendererPool, e4, 0, IntRect{32, 0, 16, 16});
 
 	Window window;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 		});
 
 		query_for_each(world, std::tie(positionPool, spriteRendererPool), [&](const Position& pos, const SpriteRenderer& renderer) {
-			spr.pos = pos.position;
+			spr.pos = pos.position.typecast<int>();
 			spr.img = renderer.img_rect;
 			main_buffer.append(spr);
 		});
