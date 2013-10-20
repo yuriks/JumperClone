@@ -26,7 +26,7 @@ struct Position  {
 		: position{{x, y}}
 	{}
 };
-TypedDynamicPool<Position> positionPool;
+ObjectPool<Position> positionPool;
 
 struct Velocity {
 	static const ComponentTypeId component_id = 1;
@@ -37,7 +37,7 @@ struct Velocity {
 		: velocity{{x, y}}
 	{}
 };
-TypedDynamicPool<Velocity> velocityPool;
+ObjectPool<Velocity> velocityPool;
 
 struct CircleRenderer {
 	static const ComponentTypeId component_id = 2;
@@ -48,7 +48,7 @@ struct CircleRenderer {
 		: radius(radius)
 	{}
 };
-TypedDynamicPool<CircleRenderer> circleRendererPool;
+ObjectPool<CircleRenderer> circleRendererPool;
 
 TextureManager texture_manager;
 
