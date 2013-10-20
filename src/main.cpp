@@ -63,21 +63,21 @@ int main(int argc, char *argv[]) {
 	Handle e3 = world.createEntity("pos_vel_circle1");
 	Handle e4 = world.createEntity("pos_vel_circle2");
 
-	world.addComponentToEntity(e0, Position::component_id, positionPool.emplace(0, 0));
+	world.addComponentToEntity(positionPool, e0, 0, 0);
 
-	world.addComponentToEntity(e1, Position::component_id, positionPool.emplace(0, 0));
-	world.addComponentToEntity(e1, CircleRenderer::component_id, circleRendererPool.emplace(4));
+	world.addComponentToEntity(positionPool, e1, 0, 0);
+	world.addComponentToEntity(circleRendererPool, e1, 4);
 
-	world.addComponentToEntity(e2, Position::component_id, positionPool.emplace(0, 0));
-	world.addComponentToEntity(e2, Velocity::component_id, velocityPool.emplace(2, 1));
+	world.addComponentToEntity(positionPool, e2, 0, 0);
+	world.addComponentToEntity(velocityPool, e2, 2, 1);
 
-	world.addComponentToEntity(e3, Position::component_id, positionPool.emplace(0, 0));
-	world.addComponentToEntity(e3, Velocity::component_id, velocityPool.emplace(1, 2));
-	world.addComponentToEntity(e3, CircleRenderer::component_id, circleRendererPool.emplace(4));
+	world.addComponentToEntity(positionPool, e3, 0, 0);
+	world.addComponentToEntity(velocityPool, e3, 1, 2);
+	world.addComponentToEntity(circleRendererPool, e3, 4);
 
-	world.addComponentToEntity(e4, Position::component_id, positionPool.emplace(0, 0));
-	world.addComponentToEntity(e4, Velocity::component_id, velocityPool.emplace(2, 2));
-	world.addComponentToEntity(e4, CircleRenderer::component_id, circleRendererPool.emplace(8));
+	world.addComponentToEntity(positionPool, e4, 0, 0);
+	world.addComponentToEntity(velocityPool, e4, 2, 2);
+	world.addComponentToEntity(circleRendererPool, e4, 8);
 
 	Window window;
 	if (!window.open(640, 480)) {

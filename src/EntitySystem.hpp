@@ -44,4 +44,11 @@ struct EntityWorld {
 	EntityId createEntity(const std::string& name);
 	void addComponentToEntity(EntityId entity, ComponentTypeId type, ComponentHandle handle);
 	void removeComponentFromEntity(EntityId entity, ComponentTypeId type);
+
+	template <typename C, typename... Args>
+	yks::Handle addComponentToEntity(yks::ObjectPool<C>& pool, EntityId entity, Args&&... params) {
+		yks::Handle h = pool.emplace(std::forward<Args>(params)...);
+		addComponentToEntity(entity, C::component_id, h);
+		return h;
+	}
 };
