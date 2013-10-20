@@ -51,12 +51,24 @@ struct SpriteRenderer {
 };
 ObjectPool<SpriteRenderer> spriteRendererPool;
 
+struct Gravity {
+	static const ComponentTypeId component_id = 3;
+
+	vec2i acceleration;
+
+	Gravity(vec2i acceleration)
+		: acceleration(acceleration)
+	{}
+};
+ObjectPool<Gravity> gravityPool;
+
 TextureManager texture_manager;
 
 int main(int argc, char *argv[]) {
 	world.addComponentType(Position::component_id, "Position");
 	world.addComponentType(Velocity::component_id, "Velocity");
 	world.addComponentType(SpriteRenderer::component_id, "SpriteRenderer");
+	world.addComponentType(Gravity::component_id, "Gravity");
 
 	Handle e0 = world.createEntity("pos");
 	Handle e1 = world.createEntity("pos_circle");
@@ -74,6 +86,7 @@ int main(int argc, char *argv[]) {
 
 	world.addComponentToEntity(positionPool, e3, vec2i{{0, 0}});
 	world.addComponentToEntity(velocityPool, e3, vec2i{{1, 2}});
+	world.addComponentToEntity(gravityPool, e3, vec2i{{0, 1}});
 	world.addComponentToEntity(spriteRendererPool, e3, 0, IntRect{32, 0, 16, 16});
 
 	world.addComponentToEntity(positionPool, e4, vec2i{{0, 0}});
@@ -118,6 +131,10 @@ int main(int argc, char *argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		glBindTexture(GL_TEXTURE_2D, texture_manager[tex]->api_handle);
+
+		query_for_each(world, std::tie(velocityPool, gravityPool), [&](Velocity& vel, const Gravity& gravity) {
+			vel.velocity += gravity.acceleration;
+		});
 
 		query_for_each(world, std::tie(positionPool, velocityPool), [&](Position& pos, const Velocity& vel) {
 			pos.position += vel.velocity;
