@@ -22,8 +22,8 @@ struct Position  {
 
 	vec2i position;
 
-	Position(int x, int y)
-		: position{{x, y}}
+	Position(vec2i position)
+		: position(position)
 	{}
 };
 ObjectPool<Position> positionPool;
@@ -33,29 +33,30 @@ struct Velocity {
 
 	vec2i velocity;
 
-	Velocity(int x, int y)
-		: velocity{{x, y}}
+	Velocity(vec2i velocity)
+		: velocity(velocity)
 	{}
 };
 ObjectPool<Velocity> velocityPool;
 
-struct CircleRenderer {
+struct SpriteRenderer {
 	static const ComponentTypeId component_id = 2;
 
-	int radius;
+	int layer;
+	IntRect img_rect;
 
-	CircleRenderer(int radius)
-		: radius(radius)
+	SpriteRenderer(int layer, IntRect img_rect)
+		: layer(layer), img_rect(img_rect)
 	{}
 };
-ObjectPool<CircleRenderer> circleRendererPool;
+ObjectPool<SpriteRenderer> spriteRendererPool;
 
 TextureManager texture_manager;
 
 int main(int argc, char *argv[]) {
 	world.addComponentType(Position::component_id, "Position");
 	world.addComponentType(Velocity::component_id, "Velocity");
-	world.addComponentType(CircleRenderer::component_id, "CircleRenderer");
+	world.addComponentType(SpriteRenderer::component_id, "SpriteRenderer");
 
 	Handle e0 = world.createEntity("pos");
 	Handle e1 = world.createEntity("pos_circle");
@@ -63,21 +64,21 @@ int main(int argc, char *argv[]) {
 	Handle e3 = world.createEntity("pos_vel_circle1");
 	Handle e4 = world.createEntity("pos_vel_circle2");
 
-	world.addComponentToEntity(positionPool, e0, 0, 0);
+	world.addComponentToEntity(positionPool, e0, vec2i{{0, 0}});
 
-	world.addComponentToEntity(positionPool, e1, 0, 0);
-	world.addComponentToEntity(circleRendererPool, e1, 4);
+	world.addComponentToEntity(positionPool, e1, vec2i{{0, 0}});
+	world.addComponentToEntity(spriteRendererPool, e1, 0, IntRect{32, 0, 16, 16});
 
-	world.addComponentToEntity(positionPool, e2, 0, 0);
-	world.addComponentToEntity(velocityPool, e2, 2, 1);
+	world.addComponentToEntity(positionPool, e2, vec2i{{0, 0}});
+	world.addComponentToEntity(velocityPool, e2, vec2i{{2, 1}});
 
-	world.addComponentToEntity(positionPool, e3, 0, 0);
-	world.addComponentToEntity(velocityPool, e3, 1, 2);
-	world.addComponentToEntity(circleRendererPool, e3, 4);
+	world.addComponentToEntity(positionPool, e3, vec2i{{0, 0}});
+	world.addComponentToEntity(velocityPool, e3, vec2i{{1, 2}});
+	world.addComponentToEntity(spriteRendererPool, e3, 0, IntRect{32, 0, 16, 16});
 
-	world.addComponentToEntity(positionPool, e4, 0, 0);
-	world.addComponentToEntity(velocityPool, e4, 2, 2);
-	world.addComponentToEntity(circleRendererPool, e4, 8);
+	world.addComponentToEntity(positionPool, e4, vec2i{{0, 0}});
+	world.addComponentToEntity(velocityPool, e4, vec2i{{2, 2}});
+	world.addComponentToEntity(spriteRendererPool, e4, 0, IntRect{32, 0, 16, 16});
 
 	Window window;
 	if (!window.open(640, 480)) {
@@ -103,7 +104,7 @@ int main(int argc, char *argv[]) {
 	glEnable(GL_TEXTURE_2D);
 	glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
 
-	Handle tex = texture_manager.loadTexture("test", "data/test.png");
+	Handle tex = texture_manager.loadTexture("test", "data/sprites.png");
 
 	SpriteBufferIndices spr_indices;
 	SpriteBuffer main_buffer;
@@ -122,9 +123,9 @@ int main(int argc, char *argv[]) {
 			positionPool[i[0]]->position += velocityPool[i[1]]->velocity;
 		}
 
-		for (auto i : query(world, Position::component_id, CircleRenderer::component_id)) {
+		for (auto i : query(world, Position::component_id, SpriteRenderer::component_id)) {
 			spr.pos = positionPool[i[0]]->position;
-			spr.img = IntRect{0, 0, 64, 64};
+			spr.img = spriteRendererPool[i[1]]->img_rect;
 			main_buffer.append(spr);
 		}
 
