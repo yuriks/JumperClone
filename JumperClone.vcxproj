@@ -98,6 +98,7 @@
     <ClInclude Include="libyuriks\gl\gl_assert.hpp" />
     <ClInclude Include="libyuriks\gl\Texture.hpp" />
     <ClInclude Include="libyuriks\Handle.hpp" />
+    <ClInclude Include="libyuriks\index_tuple.hpp" />
     <ClInclude Include="libyuriks\math\Complex.hpp" />
     <ClInclude Include="libyuriks\math\mat.hpp" />
     <ClInclude Include="libyuriks\math\MatrixTransform.hpp" />
